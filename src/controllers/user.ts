@@ -1,0 +1,187 @@
+import User from '../model/user';
+import bcrypt from 'bcrypt';
+import express, { Request, Response } from 'express';
+import { userSchema, loginSchema } from '../middleware/validation';
+import { GOOGLE_CLIENT_ID } from '../config';
+import { OAuth2Client } from 'google-auth-library';
+//import { authenticateUserAccess } from '../auth/checkAuthentication';
+import jwt from 'jsonwebtoken';
+import crypto from 'crypto';
+import dotenv from 'dotenv';
+import { resourceUsage } from 'process';
+dotenv.config();
+const result = crypto.randomBytes(64).toString('hex');
+
+const client = new OAuth2Client(GOOGLE_CLIENT_ID);
+
+interface User {
+  name?: string;
+  email?: string;
+  picture?: string;
+}
+
+export async function createUser(
+  req: express.Request,
+  res: express.Response,
+): Promise<void> {
+  try {
+    const validation = userSchema.validate(req.body);
+    if (validation.error) {
+      console.log(validation.error);
+      //return res.send('Validation error', errors.array())
+    }
+
+    const user = await User.findOne({ email: req.body.email });
+    if (user) {
+      res.send({ success: true, message: 'User already exists' });
+    } else {
+      const userPasswd = await bcrypt.hash(req.body.password, 10);
+      const newUser = new User({
+        name: req.body.name,
+        email: req.body.email,
+        password: userPasswd,
+        confirmPasword: userPasswd,
+      });
+      await newUser.save();
+      res.send({ success: true, data: newUser });
+    }
+  } catch (e) {
+    res.send({ success: false, msg: (e as Error).message });
+  }
+}
+
+export async function userLogin(req: Request, res: Response): Promise<any> {
+  try {
+    const user = await User.findOne({ email: req.body.email });
+    if (!user) {
+      res.send({ msg: 'No user with this email exists' });
+    }
+    const matchPassword = await bcrypt.compare(
+      req.body.password,
+      user.password,
+    );
+    if (!matchPassword) {
+      res.send({ msg: 'Authentication failed' });
+    } else {
+      const token = jwt.sign({ user }, 'SECRET', { expiresIn: '1hrs' });
+      res.cookie('Authorization', token, { httpOnly: true });
+
+      // return res.status(200).json({
+      //   message: 'Auth successful',
+      //   token: token,
+      // });
+      return res.render('userloginhome');
+    }
+  } catch (err) {
+    console.log(err);
+  }
+}
+
+export async function userLogout(req: Request, res: Response): Promise<void> {
+  res.clearCookie('Authorization');
+  res.send({ message: 'User logged out' });
+}
+export async function loginPageWithGoogle(
+  req: express.Request,
+  res: express.Response,
+): Promise<void> {
+  res.render('login');
+}
+
+export async function postLogin(
+  req: express.Request,
+  res: express.Response,
+): Promise<void> {
+  const token = req.body.token;
+  console.log(token);
+
+  async function verify() {
+    const ticket = await client.verifyIdToken({
+      idToken: token, //TOKEN SENT FROM THE FRONT END
+      audience: GOOGLE_CLIENT_ID,
+    });
+    const payload: any = ticket.getPayload();
+    const userid = payload['sub'];
+    console.log(payload);
+  }
+  verify()
+    .then(() => {
+      res.cookie('session-token', token);
+      res.send('success');
+    })
+    .catch(console.error);
+}
+
+export async function getProfile(
+  req: any,
+  res: express.Response,
+): Promise<void> {
+  const user = req.user;
+  res.render('dashboard', { user });
+}
+export async function getProtectedRoute(
+  req: express.Request,
+  res: express.Response,
+): Promise<void> {
+  res.render('protectedRoute');
+}
+export async function logoutUser(
+  req: express.Request,
+  res: express.Response,
+): Promise<void> {
+  res.clearCookie('session-token');
+  res.redirect('/login');
+}
+
+export async function homePage(
+  _req: express.Request,
+  res: express.Response,
+): Promise<void> {
+  res.render('index', {
+    title: 'Hello world.....',
+  });
+}
+//stop
+export async function getUserProfileDetail(
+  req: express.Request,
+  res: express.Response,
+): Promise<void> {
+  try {
+    const user = await User.findOne({ email: req.params.email });
+    if (!user) {
+      res.send({ msg: 'no user exists' });
+    } else {
+      res.send(user);
+    }
+  } catch (err) {
+    res.send(err);
+  }
+}
+export async function updateUserProfile(
+  req: express.Request,
+  res: express.Response,
+): Promise<void> {
+  try {
+    const user = await User.findById({ _id: req.params.id });
+    console.log(user);
+    if (!user) {
+      res.send({ message: 'No user exists with this id' });
+    }
+    user.photo = req.body.photo;
+    user.bio = req.body.bio;
+    user.phone = req.body.phone;
+    await user.save();
+    res.send('sucessfully saved');
+  } catch (err: any) {
+    res.send(err);
+  }
+}
+
+// export async function facebookPage(
+//   _req: express.Request,
+//   res: express.Response,
+// ): Promise<void> {
+//   res.render('facebookAuth', {
+//     title: 'Hello world.....',
+//   });
+// }

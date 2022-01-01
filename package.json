@@ -1,0 +1,52 @@
+{
+  "name": "setnodetypescript",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "start": "node ./bin/www",
+    "migrate": "node-pg-migrate",
+    "dev": "nodemon"
+  },
+  "dependencies": {
+    "@types/bcrypt": "~5.0.0",
+    "@types/facebook-js-sdk": "^3.3.5",
+    "@types/joi": "~17.2.3",
+    "@types/jsonwebtoken": "~8.5.6",
+    "@types/mongoose": "~5.11.97",
+    "bcrypt": "~5.0.1",
+    "config": "~3.3.6",
+    "cookie-parser": "~1.4.6",
+    "crypto": "~1.0.1",
+    "dotenv": "~10.0.0",
+    "ejs": "~3.1.6",
+    "express": "~4.17.1",
+    "google-auth-library": "^7.10.4",
+    "http-errors": "~1.8.0",
+    "joi": "~17.5.0",
+    "mongodb": "~4.2.1",
+    "morgan": "~1.10.0",
+    "node-pg-migrate": "~5.10.0",
+    "nodemon": "~2.0.15",
+    "pg": "~8.7.1",
+    "query-string": "~7.0.1"
+  },
+  "devDependencies": {
+    "@types/cookie-parser": "~1.4.2",
+    "@types/cors": "~2.8.12",
+    "@types/debug": "~4.1.7",
+    "@types/express": "~4.17.13",
+    "@types/http-errors": "~1.8.1",
+    "@types/morgan": "~1.9.3",
+    "@types/node": "14",
+    "@typescript-eslint/eslint-plugin": "~4.29.1",
+    "@typescript-eslint/parser": "~4.29.1",
+    "cors": "~2.8.5",
+    "debug": "^4.3.3",
+    "eslint": "~7.32.0",
+    "eslint-config-prettier": "~8.3.0",
+    "jsonwebtoken": "~8.5.1",
+    "mongoose": "^6.1.1",
+    "prettier": "~2.3.2",
+    "typescript": "~4.3.5"
+  }
+}
