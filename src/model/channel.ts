@@ -6,7 +6,7 @@ const channelSchema = new Mongoose.Schema(
       type: String,
       required: true,
     },
-    user_id: {
+    userId: {
       type: String,
     },
     description: {

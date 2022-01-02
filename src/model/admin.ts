@@ -1,6 +1,6 @@
 import Mongoose from 'mongoose';
 
-const userSchema = new Mongoose.Schema(
+const adminSchema = new Mongoose.Schema(
   {
     name: {
       type: String,
@@ -18,6 +18,10 @@ const userSchema = new Mongoose.Schema(
     email: {
       type: String,
       required: true,
+      index: {
+        name: 'admin-email-index',
+        global: true,
+      },
     },
     password: {
       type: String,
@@ -27,14 +31,14 @@ const userSchema = new Mongoose.Schema(
       type: String,
       //required: true,
     },
-    admin_details: {
+    //admin_details: {
+    //type: String,
+    //schema: {
+    role: {
       type: String,
-      schema: {
-        role: {
-          type: String,
-          required: true,
-        },
-      },
+      required: true,
+      // },
+      //},
     },
   },
   {
@@ -42,6 +46,6 @@ const userSchema = new Mongoose.Schema(
   },
 );
 
-const User = Mongoose.model('User', userSchema);
+const Admin = Mongoose.model('Admin', adminSchema);
 
-export default User;
+export default Admin;

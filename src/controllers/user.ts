@@ -1,14 +1,15 @@
 import User from '../model/user';
 import bcrypt from 'bcrypt';
 import express, { Request, Response } from 'express';
-import { userSchema, loginSchema } from '../middleware/validation';
+import { userSchema, loginSchema, adminSchema } from '../middleware/validation';
 import { GOOGLE_CLIENT_ID } from '../config';
 import { OAuth2Client } from 'google-auth-library';
 //import { authenticateUserAccess } from '../auth/checkAuthentication';
 import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
 import dotenv from 'dotenv';
-import { resourceUsage } from 'process';
+import Admin from '../model/admin';
+
 dotenv.config();
 const result = crypto.randomBytes(64).toString('hex');
 
@@ -64,13 +65,14 @@ export async function userLogin(req: Request, res: Response): Promise<any> {
       res.send({ msg: 'Authentication failed' });
     } else {
       const token = jwt.sign({ user }, 'SECRET', { expiresIn: '1hrs' });
-      res.cookie('Authorization', token, { httpOnly: true });
-
-      // return res.status(200).json({
-      //   message: 'Auth successful',
-      //   token: token,
-      // });
-      return res.render('userloginhome');
+      //res.cookie('Authorization', token, { httpOnly: true });
+      res.setHeader('Authorization', token);
+      return res.status(200).json({
+        message: 'Auth successful',
+        token: token,
+      });
+      //res.send({ data: 'welcome to user profile details' });
+      //return res.render('userloginhome');
     }
   } catch (err) {
     console.log(err);
@@ -81,67 +83,6 @@ export async function userLogout(req: Request, res: Response): Promise<void> {
   res.clearCookie('Authorization');
   res.send({ message: 'User logged out' });
 }
-export async function loginPageWithGoogle(
-  req: express.Request,
-  res: express.Response,
-): Promise<void> {
-  res.render('login');
-}
-
-export async function postLogin(
-  req: express.Request,
-  res: express.Response,
-): Promise<void> {
-  const token = req.body.token;
-  console.log(token);
-
-  async function verify() {
-    const ticket = await client.verifyIdToken({
-      idToken: token, //TOKEN SENT FROM THE FRONT END
-      audience: GOOGLE_CLIENT_ID,
-    });
-    const payload: any = ticket.getPayload();
-    const userid = payload['sub'];
-    console.log(payload);
-  }
-  verify()
-    .then(() => {
-      res.cookie('session-token', token);
-      res.send('success');
-    })
-    .catch(console.error);
-}
-
-export async function getProfile(
-  req: any,
-  res: express.Response,
-): Promise<void> {
-  const user = req.user;
-  res.render('dashboard', { user });
-}
-export async function getProtectedRoute(
-  req: express.Request,
-  res: express.Response,
-): Promise<void> {
-  res.render('protectedRoute');
-}
-export async function logoutUser(
-  req: express.Request,
-  res: express.Response,
-): Promise<void> {
-  res.clearCookie('session-token');
-  res.redirect('/login');
-}
-
-export async function homePage(
-  _req: express.Request,
-  res: express.Response,
-): Promise<void> {
-  res.render('index', {
-    title: 'Hello world.....',
-  });
-}
-//stop
 export async function getUserProfileDetail(
   req: express.Request,
   res: express.Response,
@@ -170,12 +111,103 @@ export async function updateUserProfile(
     user.photo = req.body.photo;
     user.bio = req.body.bio;
     user.phone = req.body.phone;
+    //user.admin_details.schema.role = req.body.admin;
     await user.save();
     res.send('sucessfully saved');
   } catch (err: any) {
     res.send(err);
   }
 }
+export async function createAdmin(req: Request, res: Response): Promise<any> {
+  try {
+    const validation = adminSchema.validate(req.body);
+    if (validation.error) {
+      console.log(validation.error);
+      //return res.send('Validation error', errors.array())
+    }
+    const admin = await Admin.findOne({ email: req.body.email });
+    if (admin) {
+      res.send('admin already exist');
+    }
+    const createAdmin = new Admin({
+      name: req.body.name,
+      email: req.body.email,
+      password: req.body.password,
+      phone: req.body.phone,
+      bio: req.body.bio,
+      //admin_details: {
+      role: req.body.role,
+      //create_by: { name: `${admin.name}`, _id: admin._id },
+      //},
+    });
+    await createAdmin.save();
+    res.send({ msg: 'admin created successful', createAdmin });
+  } catch (err: any) {
+    res.send({ Error: err.message });
+    console.log(err);
+  }
+}
+// export async function loginPageWithGoogle(
+//   req: express.Request,
+//   res: express.Response,
+// ): Promise<void> {
+//   res.render('login');
+// }
+
+// export async function postLogin(
+//   req: express.Request,
+//   res: express.Response,
+// ): Promise<void> {
+//   const token = req.body.token;
+//   console.log(token);
+
+//   async function verify() {
+//     const ticket = await client.verifyIdToken({
+//       idToken: token, //TOKEN SENT FROM THE FRONT END
+//       audience: GOOGLE_CLIENT_ID,
+//     });
+//     const payload: any = ticket.getPayload();
+//     const userid = payload['sub'];
+//     console.log(payload);
+//   }
+//   verify()
+//     .then(() => {
+//       res.cookie('session-token', token);
+//       res.send('success');
+//     })
+//     .catch(console.error);
+// }
+
+// export async function getProfile(
+//   req: any,
+//   res: express.Response,
+// ): Promise<void> {
+//   const user = req.user;
+//   res.render('dashboard', { user });
+// }
+// export async function getProtectedRoute(
+//   req: express.Request,
+//   res: express.Response,
+// ): Promise<void> {
+//   res.render('protectedRoute');
+// }
+// export async function logoutUser(
+//   req: express.Request,
+//   res: express.Response,
+// ): Promise<void> {
+//   res.clearCookie('session-token');
+//   res.redirect('/login');
+// }
+
+// export async function homePage(
+//   _req: express.Request,
+//   res: express.Response,
+// ): Promise<void> {
+//   res.render('index', {
+//     title: 'Hello world.....',
+//   });
+// }
+//stop
 
 // export async function facebookPage(
 //   _req: express.Request,

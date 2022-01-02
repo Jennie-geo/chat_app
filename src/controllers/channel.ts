@@ -1,7 +1,7 @@
 import ChannelModel from '../model/channel';
 import { Request, Response } from 'express';
 import { channelValidation } from '../middleware/validation';
-import { send } from 'process';
+import User from '../model/user';
 
 export async function createChannel(req: Request, res: Response): Promise<any> {
   //validation
@@ -10,6 +10,7 @@ export async function createChannel(req: Request, res: Response): Promise<any> {
     if (validation.error) {
       console.log(validation.error);
     }
+    const user = await User.findById({ _id: req.body.id });
     const channel = await ChannelModel.findOne({ name: req.body.name });
     if (channel)
       return res.send({
@@ -19,6 +20,7 @@ export async function createChannel(req: Request, res: Response): Promise<any> {
     const newChannel = new ChannelModel({
       name: req.body.name,
       description: req.body.description,
+      userId: user._id,
     });
     await newChannel.save();
     res.json({ message: 'New channel created', data: newChannel });
@@ -31,6 +33,7 @@ export async function getAllExistingChannels(
   res: Response,
 ): Promise<any> {
   const channels = await ChannelModel.find();
+  const user = await User.findById();
   if (!channels) {
     res.send({});
   } else {

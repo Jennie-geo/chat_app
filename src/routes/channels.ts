@@ -5,8 +5,8 @@ import { createChannel, getAllExistingChannels } from '../controllers/channel';
 
 router.post(
   '/api/v1/create_channel',
-  authlogin,
-  adminAuth('admin'),
+  // authlogin,
+  // adminAuth('admin'),
   createChannel,
 );
 router.get(
