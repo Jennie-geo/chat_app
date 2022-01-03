@@ -33,7 +33,7 @@ export async function getAllExistingChannels(
   res: Response,
 ): Promise<any> {
   const channels = await ChannelModel.find();
-  const user = await User.findById();
+  //const user = await User.findById({_id: req.body.id});
   if (!channels) {
     res.send({});
   } else {

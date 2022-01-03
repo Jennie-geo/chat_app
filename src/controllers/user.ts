@@ -1,3 +1,4 @@
+//require('dotenv').config();
 import User from '../model/user';
 import bcrypt from 'bcrypt';
 import express, { Request, Response } from 'express';
@@ -9,6 +10,7 @@ import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
 import dotenv from 'dotenv';
 import Admin from '../model/admin';
+//import config from '../config'
 
 dotenv.config();
 const result = crypto.randomBytes(64).toString('hex');
@@ -62,7 +64,7 @@ export async function userLogin(req: Request, res: Response): Promise<any> {
       user.password,
     );
     if (!matchPassword) {
-      res.send({ msg: 'Authentication failed' });
+      res.send({ msg: "Authentication failed, Password doesn't match" });
     } else {
       const token = jwt.sign({ user }, 'SECRET', { expiresIn: '1hrs' });
       //res.cookie('Authorization', token, { httpOnly: true });
@@ -127,7 +129,7 @@ export async function createAdmin(req: Request, res: Response): Promise<any> {
     }
     const admin = await Admin.findOne({ email: req.body.email });
     if (admin) {
-      res.send('admin already exist');
+      return res.send('admin already exist');
     }
     const createAdmin = new Admin({
       name: req.body.name,
@@ -144,6 +146,42 @@ export async function createAdmin(req: Request, res: Response): Promise<any> {
     res.send({ msg: 'admin created successful', createAdmin });
   } catch (err: any) {
     res.send({ Error: err.message });
+    console.log(err);
+  }
+}
+export async function loginAdmin(req: Request, res: Response): Promise<any> {
+  try {
+    console.log('yessss');
+    const admin = await Admin.findOne({ email: req.body.email });
+    if (!admin) {
+      console.log('nooooo');
+      return res.json({ data: 'no admin exist' });
+    } else {
+      const adminPassword = await bcrypt.compare(
+        req.body.password,
+        admin.password,
+      );
+      if (!adminPassword) {
+        return res.send("password doesn't match");
+      } else {
+        const token = jwt.sign({ admin }, 'SECRET', { expiresIn: '1hrs' });
+        res.setHeader('Authorization', token);
+        return res.status(200).json({
+          message: 'Login success',
+          token: token,
+        });
+      }
+    }
+  } catch (err) {
+    res.send(err);
+  }
+}
+export async function getAdmin(req: Request, res: Response): Promise<any> {
+  const admin = await Admin.find();
+  try {
+    if (!admin) return res.send('No admin exist');
+    res.status(200).json({ data: admin });
+  } catch (err) {
     console.log(err);
   }
 }

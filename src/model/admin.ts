@@ -31,14 +31,14 @@ const adminSchema = new Mongoose.Schema(
       type: String,
       //required: true,
     },
-    //admin_details: {
-    //type: String,
-    //schema: {
-    role: {
+    admin_details: {
       type: String,
-      required: true,
-      // },
-      //},
+      schema: {
+        role: {
+          type: String,
+          required: true,
+        },
+      },
     },
   },
   {
