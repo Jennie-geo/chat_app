@@ -31,15 +31,15 @@ const adminSchema = new Mongoose.Schema(
       type: String,
       //required: true,
     },
-    admin_details: {
+    // admin_details: {
+    //   type: String,
+    //   schema: {
+    role: {
       type: String,
-      schema: {
-        role: {
-          type: String,
-          required: true,
-        },
-      },
+      required: true,
     },
+    //   },
+    // },
   },
   {
     timestamps: true,

@@ -131,16 +131,15 @@ export async function createAdmin(req: Request, res: Response): Promise<any> {
     if (admin) {
       return res.send('admin already exist');
     }
+    const adminPassword = await bcrypt.hash(req.body.password, 10);
     const createAdmin = new Admin({
       name: req.body.name,
       email: req.body.email,
-      password: req.body.password,
+      password: adminPassword,
       phone: req.body.phone,
       bio: req.body.bio,
-      //admin_details: {
       role: req.body.role,
       //create_by: { name: `${admin.name}`, _id: admin._id },
-      //},
     });
     await createAdmin.save();
     res.send({ msg: 'admin created successful', createAdmin });
@@ -151,26 +150,26 @@ export async function createAdmin(req: Request, res: Response): Promise<any> {
 }
 export async function loginAdmin(req: Request, res: Response): Promise<any> {
   try {
-    console.log('yessss');
     const admin = await Admin.findOne({ email: req.body.email });
     if (!admin) {
       console.log('nooooo');
-      return res.json({ data: 'no admin exist' });
+      return res.json({ message: 'No Admin Exists' });
+    }
+    const adminPassword = await bcrypt.compare(
+      req.body.password,
+      admin.password,
+    );
+
+    console.log(admin);
+    if (!adminPassword) {
+      return res.send({ message: "password doesn't match" });
     } else {
-      const adminPassword = await bcrypt.compare(
-        req.body.password,
-        admin.password,
-      );
-      if (!adminPassword) {
-        return res.send("password doesn't match");
-      } else {
-        const token = jwt.sign({ admin }, 'SECRET', { expiresIn: '1hrs' });
-        res.setHeader('Authorization', token);
-        return res.status(200).json({
-          message: 'Login success',
-          token: token,
-        });
-      }
+      const token = jwt.sign({ admin }, 'SECRET', { expiresIn: '1hrs' });
+      res.setHeader('Authorization', token);
+      return res.status(200).json({
+        message: 'Login success',
+        token: token,
+      });
     }
   } catch (err) {
     res.send(err);

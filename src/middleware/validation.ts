@@ -29,6 +29,6 @@ export const adminSchema = Joi.object({
   bio: Joi.string().trim().max(30),
   role: Joi.string().trim(),
   created_by: Joi.string().trim(),
-  password: Joi.string().pattern(new RegExp('^[a-zA-Z0-9]{3,30}$')),
+  password: Joi.string().trim().pattern(new RegExp('^[a-zA-Z0-9]{3,30}$')),
   confirmPassword: Joi.ref('password'),
 });
