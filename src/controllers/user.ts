@@ -134,7 +134,7 @@ export async function createAdmin(req: Request, res: Response): Promise<any> {
       return res.send('admin already exist');
     }
     const adminPassword = await bcrypt.hash(req.body.password, 10);
-    const createAdmin = new Admin({
+    const createAdmin = new User({
       name: req.body.name,
       email: req.body.email,
       password: adminPassword,
@@ -179,7 +179,7 @@ export async function loginAdmin(req: Request, res: Response): Promise<any> {
   }
 }
 export async function getAdmin(req: Request, res: Response): Promise<any> {
-  const admin = await User.find();
+  const admin = await User.find({ role: 'admin' });
   try {
     if (!admin) return res.send('No admin exist');
     res.status(200).json({ data: admin });

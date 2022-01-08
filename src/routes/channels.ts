@@ -12,7 +12,7 @@ router.post(
 router.get(
   '/api/v1/getAllChannels',
   authlogin,
-  adminAuth('admin'),
+  adminAuth,
   getAllExistingChannels,
 );
 

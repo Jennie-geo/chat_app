@@ -31,35 +31,36 @@ export function authlogin(req: Users, res: Response, next: NextFunction): any {
 interface customJwtPayLoad extends jwt.JwtPayload {
   adminId?: string;
 }
-export function adminAuth() {
-  return (req: Users, res: Response, next: NextFunction): any => {
-    const token = req.headers['authorization'];
-    if (!token) {
-      return res.status(403).send('login please');
-    }
-    const admintokenBody = token.slice(7);
-    jwt.verify(
-      admintokenBody,
-      'SECRET',
-      async (err, decoded: customJwtPayLoad | undefined) => {
-        if (err) {
-          return res.status(403).send({ Error: 'Access denied' });
-        } else {
-          const { adminId } = decoded!;
-          const admin = await User.findById(adminId);
-          if (!admin) {
-            return res.send({ msg: 'No admin exists with this id' });
-          }
-          if (admin.role === 'admin') {
-            res.send({ result: 'welcome on board' });
-          } else {
-            return res.status(401).send('Not allowed to continue');
-          }
+export function adminAuth(req: Users, res: Response, next: NextFunction): any {
+  console.log('adminAuth: working');
+  const token = req.headers['authorization'];
+  if (!token) {
+    return res.status(403).send('login please');
+  }
+  const admintokenBody = token.slice(7);
+  jwt.verify(
+    admintokenBody,
+    'SECRET',
+    async (err, decoded: customJwtPayLoad | undefined) => {
+      if (err) {
+        return res.status(403).send({ Error: 'Access denied' });
+      } else {
+        const { adminId } = decoded!;
+        const user = await User.findById(adminId);
+        console.log('admin auth says:', user);
+        if (!user) {
+          return res.send({ msg: 'No admin exists with this id' });
         }
-        next();
-      },
-    );
-  };
+        if (user.role === 'admin') {
+          next();
+          //res.send({ result: 'welcome on board' });
+        } else {
+          return res.send({ msg: 'you are not an admin' });
+        }
+      }
+    },
+  );
 }
+
 //export default { authlogin };
 //module.exports = { authlogin, adminAuth };
