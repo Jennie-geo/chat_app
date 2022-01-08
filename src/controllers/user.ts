@@ -2,7 +2,7 @@
 import User from '../model/user';
 import bcrypt from 'bcrypt';
 import express, { Request, Response } from 'express';
-import { userSchema, loginSchema, adminSchema } from '../middleware/validation';
+import { userSchema, loginSchema } from '../middleware/validation';
 import { GOOGLE_CLIENT_ID } from '../config';
 import { OAuth2Client } from 'google-auth-library';
 //import { authenticateUserAccess } from '../auth/checkAuthentication';
@@ -42,6 +42,8 @@ export async function createUser(
       const newUser = new User({
         name: req.body.name,
         email: req.body.email,
+        role: req.body.role,
+        bio: req.body.bio,
         password: userPasswd,
         confirmPasword: userPasswd,
       });
@@ -106,7 +108,7 @@ export async function updateUserProfile(
 ): Promise<void> {
   try {
     const user = await User.findById({ _id: req.params.id });
-    console.log(user);
+
     if (!user) {
       res.send({ message: 'No user exists with this id' });
     }
@@ -122,12 +124,12 @@ export async function updateUserProfile(
 }
 export async function createAdmin(req: Request, res: Response): Promise<any> {
   try {
-    const validation = adminSchema.validate(req.body);
+    const validation = userSchema.validate(req.body);
     if (validation.error) {
       console.log(validation.error);
       //return res.send('Validation error', errors.array())
     }
-    const admin = await Admin.findOne({ email: req.body.email });
+    const admin = await User.findOne({ email: req.body.email });
     if (admin) {
       return res.send('admin already exist');
     }
@@ -150,33 +152,34 @@ export async function createAdmin(req: Request, res: Response): Promise<any> {
 }
 export async function loginAdmin(req: Request, res: Response): Promise<any> {
   try {
-    const admin = await Admin.findOne({ email: req.body.email });
+    const admin = await User.findOne({ email: req.body.email });
     if (!admin) {
-      console.log('nooooo');
-      return res.json({ message: 'No Admin Exists' });
+      return res.json({ message: 'No Admin Exists.' });
     }
     const adminPassword = await bcrypt.compare(
       req.body.password,
       admin.password,
     );
-
-    console.log(admin);
     if (!adminPassword) {
       return res.send({ message: "password doesn't match" });
     } else {
-      const token = jwt.sign({ admin }, 'SECRET', { expiresIn: '1hrs' });
+      //console.log(admin._id, admin._id.toString(), admin.id);
+      const token = jwt.sign({ adminId: admin.id }, 'SECRET', {
+        expiresIn: '1hrs',
+      });
       res.setHeader('Authorization', token);
       return res.status(200).json({
-        message: 'Login success',
+        message: 'Login successful',
         token: token,
       });
     }
   } catch (err) {
+    console.log(err);
     res.send(err);
   }
 }
 export async function getAdmin(req: Request, res: Response): Promise<any> {
-  const admin = await Admin.find();
+  const admin = await User.find();
   try {
     if (!admin) return res.send('No admin exist');
     res.status(200).json({ data: admin });

@@ -27,6 +27,11 @@ const userSchema = new Mongoose.Schema(
       type: String,
       //required: true,
     },
+    role: {
+      type: String,
+      enum: ['admin', 'user'],
+      required: true,
+    },
     admin_details: {
       type: String,
       schema: {
