@@ -9,7 +9,6 @@ import { OAuth2Client } from 'google-auth-library';
 import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
 import dotenv from 'dotenv';
-import Admin from '../model/admin';
 //import config from '../config'
 
 dotenv.config();
@@ -55,44 +54,40 @@ export async function createUser(
   }
 }
 
-export async function userLogin(req: Request, res: Response): Promise<any> {
-  try {
-    const user = await User.findOne({ email: req.body.email });
-    if (!user) {
-      res.send({ msg: 'No user with this email exists' });
-    }
-    const matchPassword = await bcrypt.compare(
-      req.body.password,
-      user.password,
-    );
-    if (!matchPassword) {
-      res.send({ msg: "Authentication failed, Password doesn't match" });
-    } else {
-      const token = jwt.sign({ user }, 'SECRET', { expiresIn: '1hrs' });
-      //res.cookie('Authorization', token, { httpOnly: true });
-      res.setHeader('Authorization', token);
-      return res.status(200).json({
-        message: 'Auth successful',
-        token: token,
-      });
-      //res.send({ data: 'welcome to user profile details' });
-      //return res.render('userloginhome');
-    }
-  } catch (err) {
-    console.log(err);
-  }
-}
+// export async function userLogin(req: Request, res: Response): Promise<any> {
+//   try {
+//     const user = await User.findOne({ email: req.body.email });
+//     if (!user) {
+//       res.send({ msg: 'No user with this email exists' });
+//     }
+//     const matchPassword = await bcrypt.compare(
+//       req.body.password,
+//       user.password,
+//     );
+//     if (!matchPassword) {
+//       res.send({ msg: "Authentication failed, Password doesn't match" });
+//     } else {
+//       const token = jwt.sign({ user }, 'SECRET', { expiresIn: '1h' });
+//       //res.cookie('Authorization', token, { httpOnly: true });
+//       res.setHeader('Authorization', token);
+//       return res.status(200).json({
+//         message: 'Auth successful',
+//         token: token,
+//       });
+//       //res.send({ data: 'welcome to user profile details' });
+//       //return res.render('userloginhome');
+//     }
+//   } catch (err) {
+//     console.log(err);
+//   }
+// }
 
-export async function userLogout(req: Request, res: Response): Promise<void> {
-  res.clearCookie('Authorization');
-  res.send({ message: 'User logged out' });
-}
 export async function getUserProfileDetail(
   req: express.Request,
   res: express.Response,
 ): Promise<void> {
   try {
-    const user = await User.findOne({ email: req.params.email });
+    const user = await User.findOne({ email: req.body.email });
     if (!user) {
       res.send({ msg: 'no user exists' });
     } else {
@@ -115,6 +110,7 @@ export async function updateUserProfile(
     user.photo = req.body.photo;
     user.bio = req.body.bio;
     user.phone = req.body.phone;
+    user.role = req.body.role;
     //user.admin_details.schema.role = req.body.admin;
     await user.save();
     res.send('sucessfully saved');
@@ -150,22 +146,19 @@ export async function createAdmin(req: Request, res: Response): Promise<any> {
     console.log(err);
   }
 }
-export async function loginAdmin(req: Request, res: Response): Promise<any> {
+export async function loginUser(req: Request, res: Response): Promise<any> {
   try {
-    const admin = await User.findOne({ email: req.body.email });
-    if (!admin) {
-      return res.json({ message: 'No Admin Exists.' });
+    const user = await User.findOne({ email: req.body.email });
+    if (!user) {
+      return res.json({ message: 'No User Exists.' });
     }
-    const adminPassword = await bcrypt.compare(
-      req.body.password,
-      admin.password,
-    );
-    if (!adminPassword) {
+    const userPassword = await bcrypt.compare(req.body.password, user.password);
+    if (!userPassword) {
       return res.send({ message: "password doesn't match" });
     } else {
-      //console.log(admin._id, admin._id.toString(), admin.id);
-      const token = jwt.sign({ adminId: admin.id }, 'SECRET', {
-        expiresIn: '1hrs',
+      //console.log(user._id, user._id.toString(), user.id);
+      const token = jwt.sign({ userId: user.id }, 'SECRET', {
+        expiresIn: '1h',
       });
       res.setHeader('Authorization', token);
       return res.status(200).json({
@@ -186,6 +179,11 @@ export async function getAdmin(req: Request, res: Response): Promise<any> {
   } catch (err) {
     console.log(err);
   }
+}
+
+export async function userLogout(req: Request, res: Response): Promise<void> {
+  res.clearCookie('Authorization');
+  res.send({ message: 'User logged out' });
 }
 // export async function loginPageWithGoogle(
 //   req: express.Request,

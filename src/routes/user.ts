@@ -6,10 +6,9 @@ import {
   getUserProfileDetail,
   createUser,
   userLogout,
-  userLogin,
   createAdmin,
   getAdmin,
-  loginAdmin,
+  loginUser,
   // homePage,
   // loginPageWithGoogle,
   // getProfile,
@@ -18,18 +17,19 @@ import {
   //facebookPage,
 } from '../controllers/user';
 //import { checkAuthenticated } from '../auth/checkAuthentication';
-import { adminAuth, authlogin } from '../middleware/loginAuth';
+import { adminAuth, authlogin, isLoggedIn } from '../middleware/loginAuth';
 
 //router.get('/', homePage);
 router.post('/api/v1/user/create_User', createUser);
 router.post('/api/v1/user/authenticate/google');
 router.post('/api/v1/admin/create_Admin', createAdmin);
 router.get('/api/v1/admin/getAdmin', authlogin, adminAuth, getAdmin);
-router.post('/api/v1/admin/adminLogin', loginAdmin);
+router.post('/api/v1/admin/login', isLoggedIn, loginUser);
 router.put('/api/vi/createUserProfile/:id', authlogin, updateUserProfile);
-router.get('/api/vi/getUser/:email', getUserProfileDetail);
-router.post('/api/login', userLogin);
-router.post('/api/logout', userLogout);
+router.get('/api/vi/getUser', authlogin, getUserProfileDetail);
+//allow login to be accessible only if you are a guess
+router.post('/api/logout', authlogin, userLogout);
+
 //router.get('/api/vi/user_login', loginPageWithGoogle);
 // router.get('/dashboard', checkAuthenticated, getProfile);
 // router.get('/protectedRoute', checkAuthenticated, getProtectedRoute);
