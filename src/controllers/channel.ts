@@ -99,36 +99,36 @@ export async function joinChannel(req: Request, res: Response): Promise<any> {
     res.send(err);
   }
 }
-// export async function getChannelMembers(
-//   req: Request,
-//   res: Response,
-// ): Promise<any> {
-//   try {
-//     const channel = await ChannelModel.findById({ _id: req.params.id });
-//     if (!channel) return res.send({ msg: 'No channel with the id exists' });
-//     const token = req.headers['authorization'];
-//     if (!token) return res.send({ msg: 'Please, login to continue' });
+export async function getChannelMembers(
+  req: Request,
+  res: Response,
+): Promise<any> {
+  try {
+    const channel = await ChannelModel.findById({ _id: req.params.id });
+    if (!channel) return res.send({ msg: 'No channel with the id exists' });
+    const token = req.headers['authorization'];
+    if (!token) return res.send({ msg: 'Please, login to continue' });
 
-//     const tokenBody = token.slice(7);
-//     jwt.verify(
-//       tokenBody,
-//       'SECRET',
-//       async (err, decoded: customJwtPayLoad | undefined) => {
-//         if (err) {
-//           return res.send({ msg: err });
-//         }
-//         const { userId } = decoded!;
-//         const user = await User.findById(userId);
-//         if (!user) {
-//           return res.send({ msg: 'No User exist' });
-//         }
-//         if (channel.members.length > 0) {
-//           return res.send({ success: true, msg: channel.members });
-//         }
-//         res.send({ msg: 'No member exist in this channel' });
-//       },
-//     );
-//   } catch (err) {
-//     res.status(500).json({ Error: err });
-//   }
-// }
+    const tokenBody = token.slice(7);
+    jwt.verify(
+      tokenBody,
+      'SECRET',
+      async (err, decoded: customJwtPayLoad | undefined) => {
+        if (err) {
+          return res.send({ msg: err });
+        }
+        const { userId } = decoded!;
+        const user = await User.findById(userId);
+        if (!user) {
+          return res.send({ msg: 'No User exist' });
+        }
+        if (channel.members.length > 0) {
+          return res.send({ success: true, msg: channel.members });
+        }
+        res.send({ msg: 'No member exist in this channel' });
+      },
+    );
+  } catch (err) {
+    res.status(500).json({ Error: err });
+  }
+}
