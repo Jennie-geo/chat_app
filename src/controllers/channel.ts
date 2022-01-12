@@ -76,22 +76,22 @@ export async function joinChannel(req: Request, res: Response): Promise<any> {
         } else {
           //there is a valid token
           const { userId } = decoded!;
-          let count = 0;
           const user = await User.findById(userId);
-
+          let count = 0;
           if (!user) {
             return res.send({
               login: `No user with the id ${userId} exists`,
             });
           }
           if (channel.members.includes(user._id)) {
-            res.send({ msg: 'this Id already exists' });
+            return res.send({ msg: `this ${user._id} already exists` });
+          } else {
+            channel.members.push(user.id);
+            channel.status = 'active';
+            channel.count = count++;
+            channel.save();
+            res.json({ success: true, data: channel });
           }
-          channel.members.push(user);
-          channel.status = 'active';
-          channel.count = count++;
-          channel.save();
-          res.json({ success: true, data: channel });
         }
       },
     );
@@ -99,3 +99,36 @@ export async function joinChannel(req: Request, res: Response): Promise<any> {
     res.send(err);
   }
 }
+// export async function getChannelMembers(
+//   req: Request,
+//   res: Response,
+// ): Promise<any> {
+//   try {
+//     const channel = await ChannelModel.findById({ _id: req.params.id });
+//     if (!channel) return res.send({ msg: 'No channel with the id exists' });
+//     const token = req.headers['authorization'];
+//     if (!token) return res.send({ msg: 'Please, login to continue' });
+
+//     const tokenBody = token.slice(7);
+//     jwt.verify(
+//       tokenBody,
+//       'SECRET',
+//       async (err, decoded: customJwtPayLoad | undefined) => {
+//         if (err) {
+//           return res.send({ msg: err });
+//         }
+//         const { userId } = decoded!;
+//         const user = await User.findById(userId);
+//         if (!user) {
+//           return res.send({ msg: 'No User exist' });
+//         }
+//         if (channel.members.length > 0) {
+//           return res.send({ success: true, msg: channel.members });
+//         }
+//         res.send({ msg: 'No member exist in this channel' });
+//       },
+//     );
+//   } catch (err) {
+//     res.status(500).json({ Error: err });
+//   }
+// }

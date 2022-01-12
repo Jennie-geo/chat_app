@@ -5,6 +5,7 @@ import {
   createChannel,
   getAllExistingChannels,
   joinChannel,
+  //getChannelMembers,
 } from '../controllers/channel';
 
 router.post(
@@ -20,5 +21,6 @@ router.get(
   getAllExistingChannels,
 );
 router.post('/api/v1/joinAChannel/:id', joinChannel);
+//router.get('/api/v1/getchannelmembers/:id', getChannelMembers);
 
 export default router;
