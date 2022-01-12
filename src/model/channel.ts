@@ -6,8 +6,9 @@ const channelSchema = new Mongoose.Schema(
       type: String,
       required: true,
     },
-    userId: {
+    admin: {
       type: String,
+      ref: 'User',
     },
     description: {
       type: String,
@@ -21,7 +22,11 @@ const channelSchema = new Mongoose.Schema(
       enum: ['active', 'inactive'],
       default: 'inactive',
     },
+    members: {
+      type: Array,
+    },
   },
+
   {
     timestamps: true,
   },

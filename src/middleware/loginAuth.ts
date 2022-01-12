@@ -16,7 +16,7 @@ interface customJwtPayLoad extends jwt.JwtPayload {
   adminId?: string;
   userId?: string;
 }
-
+// checking if a user is already logged in
 export function isLoggedIn(
   req: Request,
   res: Response,
@@ -49,9 +49,9 @@ export function isLoggedIn(
     },
   );
 }
-
+//users login authorization
 export function authlogin(req: Users, res: Response, next: NextFunction): any {
-  const token = req.headers['authorization'] as string;
+  const token = req.headers['authorization'];
   if (!token) {
     return res.status(403).send('You have to login to continue');
   }
@@ -77,6 +77,7 @@ export function authlogin(req: Users, res: Response, next: NextFunction): any {
     },
   );
 }
+//admin authorization
 export function adminAuth(req: Users, res: Response, next: NextFunction): any {
   const token = req.headers['authorization'];
   if (!token) {
@@ -104,6 +105,3 @@ export function adminAuth(req: Users, res: Response, next: NextFunction): any {
     },
   );
 }
-
-//export default { authlogin };
-//module.exports = { authlogin, adminAuth };

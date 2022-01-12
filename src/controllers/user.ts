@@ -181,10 +181,13 @@ export async function getAdmin(req: Request, res: Response): Promise<any> {
   }
 }
 
-export async function userLogout(req: Request, res: Response): Promise<void> {
-  res.clearCookie('Authorization');
-  res.send({ message: 'User logged out' });
-}
+//logout is from the front end where the token will store in the session or cookie
+
+// export async function userLogout(req: Request, res: Response): Promise<void> {
+//   res.clearCookie('Authorization');
+//   res.send({ message: 'User logged out' });
+// }
+
 // export async function loginPageWithGoogle(
 //   req: express.Request,
 //   res: express.Response,

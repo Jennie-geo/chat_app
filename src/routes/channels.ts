@@ -1,7 +1,11 @@
 import express from 'express';
 const router = express.Router();
 import { authlogin, adminAuth } from '../middleware/loginAuth';
-import { createChannel, getAllExistingChannels } from '../controllers/channel';
+import {
+  createChannel,
+  getAllExistingChannels,
+  joinChannel,
+} from '../controllers/channel';
 
 router.post(
   '/api/v1/create_channel',
@@ -15,5 +19,6 @@ router.get(
   adminAuth,
   getAllExistingChannels,
 );
+router.post('/api/v1/joinAChannel/:id', joinChannel);
 
 export default router;
