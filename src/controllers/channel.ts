@@ -123,7 +123,7 @@ export async function getChannelMembers(
           return res.send({ msg: 'No User exist' });
         }
         if (channel.members.length > 0) {
-          return res.send({ success: true, msg: channel.members });
+          return res.send({ success: true, Detail: channel.members });
         }
         res.send({ msg: 'No member exist in this channel' });
       },
@@ -132,3 +132,7 @@ export async function getChannelMembers(
     res.status(500).json({ Error: err });
   }
 }
+
+// export async function sendMessage(req: Response, res: Response): Promise<any> {
+//   const channel = await ChannelModel.findById({_id: req.params.id})
+// }
