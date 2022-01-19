@@ -2,7 +2,8 @@ import express from 'express';
 const router = express.Router();
 import { authlogin, adminAuth } from '../middleware/loginAuth';
 import multer from 'multer';
-const upload = multer({ dest: 'images' });
+import { upload } from '../middleware/upload';
+
 import {
   createChannel,
   getAllExistingChannels,

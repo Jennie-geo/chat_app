@@ -135,5 +135,15 @@ export async function getChannelMembers(
 }
 
 export async function imageUpload(req: Request, res: Response): Promise<any> {
-  res.send('image uploaded successfully.');
+  try {
+    const user = await User.findById({ _id: req.body.id });
+    if (!user) {
+      return res.send('no user exists');
+    }
+    user.photo = req.file?.buffer;
+    user.save();
+    res.send('image uploaded successfully.');
+  } catch (err: any) {
+    res.send({ error: err.message });
+  }
 }
