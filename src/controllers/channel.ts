@@ -6,6 +6,7 @@ import {
   joinChannelValidation,
 } from '../middleware/validation';
 import User from '../model/user';
+import multer from 'multer';
 
 interface customJwtPayLoad extends jwt.JwtPayload {
   adminId?: string;
@@ -133,6 +134,6 @@ export async function getChannelMembers(
   }
 }
 
-// export async function sendMessage(req: Response, res: Response): Promise<any> {
-//   const channel = await ChannelModel.findById({_id: req.params.id})
-// }
+export async function imageUpload(req: Request, res: Response): Promise<any> {
+  res.send('image uploaded successfully.');
+}
