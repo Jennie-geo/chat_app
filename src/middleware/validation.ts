@@ -27,6 +27,10 @@ export const joinChannelValidation = Joi.object({
   user: Joi.string().trim(),
 });
 
+// export const fileValidation = Joi.object({
+
+// })
+
 // export const adminSchema = Joi.object({
 //   name: Joi.string().min(5).max(30).trim().required(),
 //   email: Joi.string()

@@ -6,13 +6,13 @@ const userSchema = new Mongoose.Schema(
       type: String,
       require: true,
     },
-    photo: {
+    image: {
+      type: Buffer,
+    },
+    bio: {
       type: String,
     },
     phone: {
-      type: Number,
-    },
-    bio: {
       type: String,
     },
     email: {

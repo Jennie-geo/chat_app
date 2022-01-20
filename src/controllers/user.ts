@@ -42,6 +42,7 @@ export async function createUser(
         name: req.body.name,
         email: req.body.email,
         role: req.body.role,
+        phone: req.body.phone,
         bio: req.body.bio,
         password: userPasswd,
         confirmPasword: userPasswd,
