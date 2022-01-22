@@ -1,6 +1,6 @@
 import express from 'express';
 const router = express.Router();
-
+import { upload } from '../middleware/upload';
 import {
   updateUserProfile,
   getUserProfileDetail,
@@ -8,6 +8,8 @@ import {
   createAdmin,
   getAdmin,
   loginUser,
+  imageUpload,
+  deleteImg,
   // homePage,
   // loginPageWithGoogle,
   // getProfile,
@@ -26,6 +28,8 @@ router.get('/api/v1/admin/getAdmin', authlogin, adminAuth, getAdmin);
 router.post('/api/v1/admin/login', isLoggedIn, loginUser);
 router.put('/api/vi/createUserProfile/:id', authlogin, updateUserProfile);
 router.get('/api/vi/getUser', authlogin, getUserProfileDetail);
+router.post('/upload', upload.single('upload'), imageUpload);
+router.delete('/api/v1/upload', deleteImg);
 //allow login to be accessible only if you are a guess
 
 //router.get('/api/vi/user_login', loginPageWithGoogle);

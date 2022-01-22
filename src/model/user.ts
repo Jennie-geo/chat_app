@@ -7,7 +7,7 @@ const userSchema = new Mongoose.Schema(
       require: true,
     },
     image: {
-      type: Buffer,
+      type: String,
     },
     bio: {
       type: String,

@@ -9,8 +9,19 @@ import { OAuth2Client } from 'google-auth-library';
 import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
 import dotenv from 'dotenv';
+import { v2 as cloudinary } from 'cloudinary';
 //import config from '../config'
 
+interface customJwtPayLoad extends jwt.JwtPayload {
+  adminId?: string;
+  userId?: string;
+}
+
+cloudinary.config({
+  cloud_name: process.env.CLOUD_NAME,
+  api_key: process.env.API_KEY,
+  api_secret: process.env.API_SECRET,
+});
 dotenv.config();
 const result = crypto.randomBytes(64).toString('hex');
 
@@ -179,6 +190,65 @@ export async function getAdmin(req: Request, res: Response): Promise<any> {
     res.status(200).json({ data: admin });
   } catch (err) {
     console.log(err);
+  }
+}
+
+export async function imageUpload(req: Request, res: Response): Promise<any> {
+  try {
+    console.log('coming');
+    const file = req.file as Express.Multer.File;
+    console.log('File: ', file);
+    // const getUser = await User.findById({ _id: req.params.id });
+    // if (!getUser && !req.body.email) {
+    // }
+    const getUser = await User.findOne({ email: req.body.email });
+    console.log('user', getUser);
+    if (!getUser) {
+      return res.send('No user exists');
+    } else {
+      const token = req.headers['authorization'];
+      if (!token) {
+        return res.status(403).send('You have to login to continue');
+      }
+      const tokenBody = token.slice(7);
+      jwt.verify(
+        tokenBody,
+        'SECRET',
+        async (err, decoded: customJwtPayLoad | undefined) => {
+          if (err) {
+            console.log('error', err);
+            return res.status(403).send({ Error: 'Access denied' });
+          } else {
+            //there is a valid token
+            const { userId } = decoded!;
+            const user = await User.findById(userId);
+            if (!user) {
+              res.send({ login: `No user with the id ${userId} exists` });
+            }
+            const result = await cloudinary.uploader.upload(file.path);
+            user.image = result.secure_url;
+            user.save();
+            res.send({ message: 'image uploaded successfully.' });
+          }
+        },
+      );
+    }
+  } catch (error) {
+    console.log('Error', error);
+  }
+}
+
+export async function deleteImg(req: Request, res: Response): Promise<any> {
+  try {
+    const user = await User.findById({ _id: req.body.id });
+    if (!user) {
+      return res.send({ message: "User doesn't exists" });
+    }
+    user.image = undefined;
+    user.save();
+    res.send({ msg: 'Image deleted successfully' });
+  } catch (err: any) {
+    res.send({ err: err.message });
   }
 }
 

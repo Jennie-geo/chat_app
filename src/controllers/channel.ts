@@ -134,43 +134,25 @@ export async function getChannelMembers(
   }
 }
 
-export async function imageUpload(req: Request, res: Response): Promise<any> {
-  try {
-    const file = req.file;
-    console.log(file);
-    const user = await User.findById({ _id: req.body.id });
-    if (!user) {
-      return res.send('No user exists');
-    }
-    user.image = req.file?.buffer;
-    user.save();
-    res.send({ message: 'image uploaded successfully.' });
-  } catch (err: any) {
-    res.send({ error: err.message });
-  }
-}
-export async function deleteImg(req: Request, res: Response): Promise<any> {
-  try {
-    const user = await User.findById({ _id: req.body.id });
-    if (!user) {
-      return res.send({ message: "User doesn't exists" });
-    }
-    user.image = undefined;
-    user.save();
-    res.send({ msg: 'Image deleted successfully' });
-  } catch (err: any) {
-    res.send({ err: err.message });
-  }
-}
-export async function displayImage(req: Request, res: Response): Promise<any> {
-  try {
-    const user = await User.findById(req.params.id);
-    if (!user || !user.image) {
-      throw new Error();
-    }
-    res.set('Content-Type', 'image/png');
-    return res.send(user.image);
-  } catch (err: any) {
-    res.send({ Error: err.message });
-  }
-}
+// export async function displayImage(req: Request, res: Response): Promise<any> {
+//   try {
+//     const user = await User.findById(req.params.id);
+//     if (!user || !user.image) {
+//       throw new Error();
+//     }
+//     res.set('Content-Type', 'image/png');
+//     return res.send(user.image);
+//   } catch (err: any) {
+//     res.send({ Error: err.message });
+//   }
+// }
+// export async function displayImage(req: Request, res: Response): Promise<any> {
+//   try {
+//     const localFilePath = req.file?.path;
+//     const result = await uploadToCloudinary(localFilePath);
+//     console.log(result);
+//     //const response = buildSuccessMsg([result.url])
+//   } catch (error) {
+//     console.log(error);
+//   }
+// }
