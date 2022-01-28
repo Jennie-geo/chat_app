@@ -59,6 +59,7 @@ export async function createUser(
         confirmPasword: userPasswd,
       });
       await newUser.save();
+      console.log('connected to react...');
       res.send({ success: true, data: newUser });
     }
   } catch (e) {
@@ -168,6 +169,7 @@ export async function loginUser(req: Request, res: Response): Promise<any> {
     if (!userPassword) {
       return res.send({ message: "password doesn't match" });
     } else {
+      console.log('connected to react...');
       //console.log(user._id, user._id.toString(), user.id);
       const token = jwt.sign({ userId: user.id }, 'SECRET', {
         expiresIn: '1h',

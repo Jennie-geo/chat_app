@@ -25,10 +25,10 @@ router.post('/api/v1/user/create_User', createUser);
 router.post('/api/v1/user/authenticate/google');
 router.post('/api/v1/admin/create_Admin', createAdmin);
 router.get('/api/v1/admin/getAdmin', authlogin, adminAuth, getAdmin);
-router.post('/api/v1/admin/login', isLoggedIn, loginUser);
-router.put('/api/vi/createUserProfile/:id', authlogin, updateUserProfile);
-router.get('/api/vi/getUser', authlogin, getUserProfileDetail);
-router.post('/upload', upload.single('upload'), imageUpload);
+router.post('/api/v1/user/login', isLoggedIn, loginUser);
+router.put('/api/v1/createUserProfile/:id', authlogin, updateUserProfile);
+router.get('/api/v1/getUser', authlogin, getUserProfileDetail);
+router.post('/api/v1/upload', upload.single('upload'), imageUpload);
 router.delete('/api/v1/upload', deleteImg);
 //allow login to be accessible only if you are a guess
 

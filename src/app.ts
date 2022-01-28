@@ -22,12 +22,20 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser()); //to enable us to set cookies in the browser front end which will be use to store access token to the session
 app.use(express.static(path.join(__dirname, '..', 'public')));
-app.use(
-  cors({
-    origin: process.env.UI_ROOT_URL,
-    credentials: true,
-  }),
-);
+const corsOptions = {
+  origin: process.env.FRONTEND_ROOT_URL,
+  origins: process.env.UI_ROOT_URL,
+  credentials: true,
+  optionSuccessStatus: 200,
+};
+app.use(cors(corsOptions));
+
+// app.use(
+//   cors({
+//     origin: process.env.UI_ROOT_URL,
+//     credentials: true,
+//   }),
+// );
 app.use('/', homePage);
 app.use('/login', loginPageWithGoogle);
 app.use('/auth', userRouter);
